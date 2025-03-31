@@ -4,6 +4,7 @@ import {
   generatePassword,
   generateSalt,
   generateToken,
+  validatePassword,
 } from "../utils/usersUtils.js";
 
 export default class UserService {
@@ -31,6 +32,55 @@ export default class UserService {
         role: user.role,
       });
       return { id: user._id, token };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async SignIn(email, password) {
+    try {
+      const userExsist = await this.repository.findUser(email);
+      if (!userExsist) {
+        throw ErrorHandler.BadRequest("Неверная почта или пароль");
+      }
+      const isValidPassword = await validatePassword(
+        password,
+        userExsist.password,
+        userExsist.salt
+      );
+      if (!isValidPassword) {
+        throw ErrorHandler.BadRequest("Неверная почта или пароль");
+      }
+      const token = await generateToken({
+        email,
+        name: userExsist.name,
+        id: userExsist._id,
+        role: userExsist.role,
+      });
+      return { id: userExsist._id, token };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async addAddress(street, city, house, apartments, user) {
+    try {
+      const changeUser = await this.repository.addAddress(
+        street,
+        city,
+        house,
+        apartments,
+        user
+      );
+      return changeUser;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getProfile(email) {
+    try {
+      return await this.repository.findUser(email);
     } catch (error) {
       console.log(error);
     }

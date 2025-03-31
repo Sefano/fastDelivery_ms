@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import Address from "./Address.js";
 import ROLES from "../../utils/roles.js";
 const UserSchema = new Schema(
   {
@@ -7,7 +8,7 @@ const UserSchema = new Schema(
     name: { type: String, require: true },
     salt: { type: String },
     role: { type: String, default: ROLES.USER },
-    address: [{ type: Schema.Types.ObjectId, ref: "address", require: true }],
+    address: { type: [Address.schema] }, //сделать вложенный док.
     cart: [
       {
         product: {

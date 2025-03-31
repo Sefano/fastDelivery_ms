@@ -1,13 +1,21 @@
-import Fastify from "fastify";
+import Fastify, { fastify } from "fastify";
 import "dotenv/config";
 import usersAPI from "./api/usersAPI.js";
 import mongoose from "mongoose";
+import cors from "cors";
+import fastifyMiddie from "@fastify/middie";
+import isAuth from "./api/middlewares/auth.js";
 
 const PORT = process.env.MS_PORT;
 
 const app = Fastify({
   logger: true,
 });
+
+//middlewares
+await app.register(fastifyMiddie);
+
+app.use(cors());
 
 usersAPI(app);
 

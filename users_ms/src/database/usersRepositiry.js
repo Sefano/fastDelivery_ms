@@ -10,7 +10,19 @@ export default class UsersRepository {
       console.log(error);
     }
   }
-  async addAddress() {}
+  async addAddress(street, city, house, apartments, user) {
+    try {
+      const changeUser = await User.findOne({ email: user.email });
+
+      await changeUser.updateOne({
+        $push: { address: { street, city, house, apartments } },
+      });
+
+      return changeUser;
+    } catch (error) {
+      console.log(error);
+    }
+  }
   async findUser(email) {
     try {
       const user = await User.findOne({ email: email });

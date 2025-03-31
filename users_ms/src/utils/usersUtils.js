@@ -19,3 +19,22 @@ export const generateToken = async (payload) => {
     console.log(error);
   }
 };
+
+export const validateSignature = async (token) => {
+  try {
+    console.log(token);
+    const payload = await jwt.verify(
+      token.split(" ")[1],
+      process.env.JWT_SECRET
+    );
+    return payload;
+    return true;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const validatePassword = async (password, dbPassword, salt) => {
+  const passToCompare = await generatePassword(password, salt);
+  return passToCompare === dbPassword;
+};

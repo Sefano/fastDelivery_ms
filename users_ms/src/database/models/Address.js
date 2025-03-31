@@ -1,10 +1,10 @@
 import { model, Schema } from "mongoose";
 
 const AddressSchema = new Schema({
-  street: { type: String, reqiried: true, unique: true },
-  city: { type: String, reqiried: true, unique: true },
-  house: { type: String, reqiried: true, unique: true },
-  apartments: { type: String, reqiried: true, unique: true },
+  street: { type: String, reqiried: true },
+  city: { type: String, reqiried: true },
+  house: { type: String, reqiried: true },
+  apartments: { type: String, reqiried: true },
 });
 
 export default model("address", AddressSchema);

@@ -1,5 +1,16 @@
+USER
 {
     "email":"test@test.com",
     "password":"test123",
     "name":"Test"
 }
+
+ADDRESS
+{
+    "street":"street",
+    "city":"city",
+    "house":"house",
+    "apartments":"23"
+}
+
+
