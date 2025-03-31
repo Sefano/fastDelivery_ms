@@ -1,11 +1,12 @@
 import { model, Schema } from "mongoose";
-
+import ROLES from "../../utils/roles.js";
 const UserSchema = new Schema(
   {
     email: { type: String, reqiried: true, unique: true },
     password: { type: String, require: true },
     name: { type: String, require: true },
     salt: { type: String },
+    role: { type: String, default: ROLES.USER },
     address: [{ type: Schema.Types.ObjectId, ref: "address", require: true }],
     cart: [
       {

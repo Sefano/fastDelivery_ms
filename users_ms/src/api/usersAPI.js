@@ -2,10 +2,11 @@ import UserService from "../services/usersService.js";
 
 export default (app) => {
   const service = new UserService();
-  app.post("/signup", (request, reply) => {
+  app.post("/signup", async (request, reply) => {
     try {
       const { email, password, name } = request.body;
-      const data = service.SignUp(email, password, name);
+      const data = await service.SignUp(email, password, name);
+      return reply.send(data);
     } catch (error) {
       console.log(error);
     }
