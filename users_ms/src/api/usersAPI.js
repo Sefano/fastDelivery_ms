@@ -1,9 +1,11 @@
 import UserService from "../services/usersService.js";
 import isAuth from "./middlewares/auth.js";
 import { addressBody, userUpBody, userInBody } from "../utils/validation.js";
+import { SubscribeMessage } from "../utils/messageBroker.js";
 
-export default (app) => {
+export default (app, channel) => {
   const service = new UserService();
+  SubscribeMessage(channel, service);
 
   app.post("/signup", { schema: userUpBody }, async (request, reply) => {
     try {

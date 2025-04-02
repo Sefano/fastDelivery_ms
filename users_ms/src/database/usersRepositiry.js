@@ -31,4 +31,27 @@ export default class UsersRepository {
       console.log(error);
     }
   }
+  async addToCart(userId, _id, name, price, image, unit) {
+    try {
+      const userToUpdate = await User.findByIdAndUpdate(
+        { _id: userId },
+        {
+          $push: {
+            cart: {
+              product: {
+                id: _id,
+                name,
+                price,
+                image,
+              },
+              unit,
+            },
+          },
+        }
+      );
+      return userToUpdate;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

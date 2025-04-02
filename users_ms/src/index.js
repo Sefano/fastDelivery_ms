@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import fastifyMiddie from "@fastify/middie";
 import isAuth from "./api/middlewares/auth.js";
+import { CreateChannel } from "./utils/messageBroker.js";
 
 const PORT = process.env.MS_PORT;
 
@@ -16,7 +17,9 @@ const app = Fastify({
 await app.register(fastifyMiddie);
 app.use(cors());
 
-usersAPI(app);
+const channel = await CreateChannel();
+
+usersAPI(app, channel);
 
 const start = async () => {
   try {

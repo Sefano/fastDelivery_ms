@@ -85,4 +85,33 @@ export default class UserService {
       console.log(error);
     }
   }
+
+  async addToCart(userId, _id, name, price, image, unit) {
+    try {
+      return await this.repository.addToCart(
+        userId,
+        _id,
+        name,
+        price,
+        image,
+        unit
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async SubscribeEvents(payload) {
+    payload = JSON.parse(payload);
+    const { event, data } = payload;
+
+    const { userId, _id, name, price, image, unit } = data;
+    switch (event) {
+      case "ADD_TO_CART":
+        this.addToCart(userId, _id, name, price, image, unit);
+        break;
+
+      default:
+        break;
+    }
+  }
 }

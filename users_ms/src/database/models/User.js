@@ -12,12 +12,12 @@ const UserSchema = new Schema(
     cart: [
       {
         product: {
-          _id: { type: String, required: true },
+          id: { type: String, required: true },
           name: { type: String },
           image: { type: String },
           price: { type: Number },
         },
-        unit: { type: Number, required: true },
+        unit: { type: Number },
       },
     ],
     orders: [

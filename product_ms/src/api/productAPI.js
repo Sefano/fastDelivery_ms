@@ -2,8 +2,9 @@ import ProductService from "../services/productService.js";
 import isAuth from "./middlewares/auth.js";
 import { productBody, caregoryBody } from "../utils/validation.js";
 import ROLES from "../../../users_ms/src/utils/roles.js";
+import { PublishMessage } from "../utils/messageBroker.js";
 
-export default (app) => {
+export default (app, channel) => {
   const service = new ProductService();
 
   app.post(
@@ -83,10 +84,19 @@ export default (app) => {
     }
   });
 
-  app.put("/cart", async (request, reply) => {
+  app.put("/cart/:id", { preParsing: [isAuth] }, async (request, reply) => {
     try {
-      const data = await service.addToCart();
-      return reply.send({ message: "Адрес успешно обновлен" });
+      const userId = request.user.id;
+
+      const { id } = request.params;
+      const unit = request.body.unit;
+      const { _id, name, price, image } = await service.getProduct(id);
+      const data = {
+        event: "ADD_TO_CART",
+        data: { userId, _id, name, price, image, unit },
+      };
+      PublishMessage(channel, process.env.PRODUCT_BIND, JSON.stringify(data));
+      return reply.send({ message: "Продукт добавлен в корзину" });
     } catch (error) {
       console.log(error);
     }
