@@ -1,6 +1,6 @@
 import Fastify, { fastify } from "fastify";
 import "dotenv/config";
-import usersAPI from "./api/usersAPI.js";
+import productAPI from "./api/productAPI.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import fastifyMiddie from "@fastify/middie";
@@ -16,7 +16,7 @@ const app = Fastify({
 await app.register(fastifyMiddie);
 app.use(cors());
 
-usersAPI(app);
+productAPI(app);
 
 const start = async () => {
   try {

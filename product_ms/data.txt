@@ -1,0 +1,16 @@
+PRODUCT
+{
+    "name":"test@test.com",
+    "description":"test123",
+    "category":"Test",
+    "price":42222,
+    "image":"image"
+}
+
+CATEGORY
+{
+    "name":"test@test.com",
+    "description":"test123",
+}
+
+

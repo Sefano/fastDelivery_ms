@@ -4,11 +4,11 @@ import ROLES from "../../utils/roles.js";
 const UserSchema = new Schema(
   {
     email: { type: String, reqiried: true, unique: true },
-    password: { type: String, require: true },
-    name: { type: String, require: true },
+    password: { type: String, required: true },
+    name: { type: String, required: true },
     salt: { type: String },
     role: { type: String, default: ROLES.USER },
-    address: { type: [Address.schema] }, //сделать вложенный док.
+    address: { type: [Address.schema] },
     cart: [
       {
         product: {
@@ -23,8 +23,8 @@ const UserSchema = new Schema(
     orders: [
       {
         _id: { type: String, required: true },
-        sum: { type: String },
-        date: { type: Date, default: Date.now() },
+        sum: { type: String, required: true },
+        date: { type: String, required: true },
       },
     ],
   },
