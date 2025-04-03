@@ -1,34 +1,26 @@
-import ProductService from "../services/productService.js";
+import OrderService from "../services/orderService.js";
 import isAuth from "./middlewares/auth.js";
 import { productBody, caregoryBody } from "../utils/validation.js";
 import ROLES from "../../../users_ms/src/utils/roles.js";
-import { PublishMessage } from "../utils/messageBroker.js";
+import { PublishMessage, SubscribeMessage } from "../utils/messageBroker.js";
 
 export default (app, channel) => {
-  const service = new ProductService();
-
-  app.post(
-    "/product",
-    { schema: productBody, preParsing: [isAuth] },
-    async (request, reply) => {
-      try {
-        if (request.user.role !== (ROLES.MANAGER || ROLES.ADMIN)) {
-          return reply.code(403).send({ message: "Недостаточно прав" });
-        }
-        const { name, description, category, price, image } = request.body;
-        const data = await service.addProduct(
-          name,
-          description,
-          category,
-          price,
-          image
-        );
-        return reply.send(data);
-      } catch (error) {
-        console.log(error);
-      }
+  const service = new OrderService();
+  SubscribeMessage(channel, service);
+  app.post("/order", async (request, reply) => {
+    try {
+      const orderData = await service.createOrder(userId, cart);
+      const { _id, amount, status, createdAt } = orderData;
+      const data = {
+        event: "ADD_ORDER",
+        data: { odredId: _id, amount, status, date: createdAt },
+      };
+      PublishMessage(channel, process.env.ORDER_BIND, JSON.stringify(data));
+      return reply.send(orderData);
+    } catch (error) {
+      console.log(error);
     }
-  );
+  });
 
   app.post(
     "/category",
@@ -93,7 +85,7 @@ export default (app, channel) => {
       const { _id, name, price, image } = await service.getProduct(id);
       const data = {
         event: "ADD_TO_CART",
-        data: { userId, productId: _id, name, price, image, unit },
+        data: { userId, _id, name, price, image, unit },
       };
       PublishMessage(channel, process.env.PRODUCT_BIND, JSON.stringify(data));
       return reply.send({ message: "Продукт добавлен в корзину" });

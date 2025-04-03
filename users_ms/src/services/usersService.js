@@ -86,30 +86,46 @@ export default class UserService {
     }
   }
 
-  async addToCart(userId, _id, name, price, image, unit) {
+  async addToCart(userId, productId, name, price, image, unit) {
     try {
+      const sumToAdd = price * unit;
       return await this.repository.addToCart(
         userId,
-        _id,
+        productId,
         name,
         price,
         image,
-        unit
+        unit,
+        sumToAdd
       );
     } catch (error) {
       console.log(error);
     }
   }
+
+  async addOrder() {}
   async SubscribeEvents(payload) {
     payload = JSON.parse(payload);
     const { event, data } = payload;
 
-    const { userId, _id, name, price, image, unit } = data;
+    const {
+      userId,
+      productId,
+      name,
+      price,
+      image,
+      unit,
+      orderId,
+      amount,
+      date,
+      status,
+    } = data;
     switch (event) {
       case "ADD_TO_CART":
-        this.addToCart(userId, _id, name, price, image, unit);
+        this.addToCart(userId, productId, name, price, image, unit);
         break;
-
+      case "ADD_ORDER":
+        this.addOrder(orderId, amount, date, status);
       default:
         break;
     }

@@ -1,7 +1,7 @@
 import UserService from "../services/usersService.js";
 import isAuth from "./middlewares/auth.js";
 import { addressBody, userUpBody, userInBody } from "../utils/validation.js";
-import { SubscribeMessage } from "../utils/messageBroker.js";
+import { PublishMessage, SubscribeMessage } from "../utils/messageBroker.js";
 
 export default (app, channel) => {
   const service = new UserService();
@@ -10,8 +10,16 @@ export default (app, channel) => {
   app.post("/signup", { schema: userUpBody }, async (request, reply) => {
     try {
       const { email, password, name } = request.body;
-      const data = await service.SignUp(email, password, name);
-      return reply.send(data);
+      const userData = await service.SignUp(email, password, name);
+      console.log(userData);
+      const { id } = userData;
+      const data = {
+        event: "CREATE_CART",
+        data: { userId: id },
+      };
+      console.log(data);
+      PublishMessage(channel, process.env.USER_CART_BIND, JSON.stringify(data));
+      return reply.send(userData);
     } catch (error) {
       console.log(error);
     }

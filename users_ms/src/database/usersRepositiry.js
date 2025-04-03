@@ -3,8 +3,12 @@ import { User } from "./models/exports.js";
 export default class UsersRepository {
   async addUser({ email, password, name, salt }) {
     try {
+      console.log("HERE");
       const user = new User({ email, password, name, salt });
       const savedUser = await user.save();
+      // await savedUser.updateOne({
+      //   $push: { address: { userId: savedUser._id } },
+      // });
       return savedUser;
     } catch (error) {
       console.log(error);
@@ -31,25 +35,43 @@ export default class UsersRepository {
       console.log(error);
     }
   }
-  async addToCart(userId, _id, name, price, image, unit) {
+  async addToCart(userId, productId, name, price, image, unit, sumToAdd) {
     try {
-      const userToUpdate = await User.findByIdAndUpdate(
-        { _id: userId },
-        {
-          $push: {
-            cart: {
-              product: {
-                id: _id,
-                name,
-                price,
-                image,
-              },
-              unit,
+      console.log(sumToAdd);
+      const user = await User.findById({ _id: userId });
+      await user.updateOne({
+        $push: {
+          cart: {
+            product: {
+              id: productId,
+              name,
+              price,
+              image,
             },
+            unit,
           },
-        }
-      );
-      return userToUpdate;
+        },
+        cartAmount: user.cartAmount + sumToAdd,
+      });
+      // const userToUpdate = await User.findByIdAndUpdate(
+      //   { _id: userId },
+      //   {
+      //     $push: {
+      //       cart: {
+      //         product: {
+      //           id: _id,
+      //           name,
+      //           price,
+      //           image,
+      //         },
+      //         unit,
+      //       },
+      //     },
+
+      //     cartAmount: cartAmount + sumToAdd,
+      //   }
+      // );
+      return { cart: user.cart, cartAmount: user.cartAmount };
     } catch (error) {
       console.log(error);
     }

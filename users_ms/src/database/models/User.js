@@ -8,7 +8,7 @@ const UserSchema = new Schema(
     name: { type: String, required: true },
     salt: { type: String },
     role: { type: String, default: ROLES.USER },
-    address: { type: [Address.schema] },
+    address: [{ type: [Address.schema] }],
     cart: [
       {
         product: {
@@ -20,11 +20,13 @@ const UserSchema = new Schema(
         unit: { type: Number },
       },
     ],
+    cartAmount: { type: Number, default: 0 },
     orders: [
       {
-        _id: { type: String, required: true },
-        sum: { type: String, required: true },
+        id: { type: String, required: true },
+        amount: { type: String, required: true },
         date: { type: String, required: true },
+        status: { type: String, required: true },
       },
     ],
   },
