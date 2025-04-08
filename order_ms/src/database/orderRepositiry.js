@@ -1,15 +1,33 @@
 import ErrorHandler from "../utils/errorHandler.js";
 import { Cart, Order } from "./models/exports.js";
+import STATUS from "../utils/status.js";
 export default class OrderRepository {
-  async createOrder(userId, cart, amount) {
+  async createOrder(userId) {
     try {
+      const cart = await Cart.findOne({ userId });
       const order = new Order({
         userId,
-        products: cart,
-        amount,
+        products: cart.cart,
+        amount: cart.cartAmount,
       });
+
       const savedOrder = order.save();
+
+      await cart.updateOne({
+        cart: [],
+        cartAmount: 0,
+      });
+
       return savedOrder;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getOrder(orderId) {
+    try {
+      const order = await Order.findById({ _id: orderId });
+      return order;
     } catch (error) {
       console.log(error);
     }
@@ -17,7 +35,26 @@ export default class OrderRepository {
 
   async addToCart(userId, productId, name, price, image, unit, sumToAdd) {
     try {
-      const cart = await Cart.findOne({ userId });
+      let cart;
+      cart = await Cart.findOne({ userId });
+      if (!cart) {
+        cart = new Cart({
+          userId,
+        });
+        await cart.save();
+      }
+
+      const existingItemIndex = cart.cart.findIndex(
+        (item) => item.product.id === productId
+      );
+
+      if (existingItemIndex >= 0) {
+        cart.cart[existingItemIndex].unit += unit;
+        cart.cart[existingItemIndex].product.price += sumToAdd;
+        cart.cartAmount += sumToAdd;
+        await cart.save();
+        return cart;
+      }
 
       const updatedCart = await cart.updateOne({
         $push: {
@@ -33,67 +70,71 @@ export default class OrderRepository {
         },
         cartAmount: cart.cartAmount + sumToAdd,
       });
-
       return updatedCart;
     } catch (error) {
       console.log(error);
     }
   }
 
-  async createCart(userId) {
+  async deleteFromCart(userId, productId, name, price, image, unit, sumToDec) {
     try {
-      const isExist = await Cart.findOne({ userId });
-      if (isExist) {
-        throw new ErrorHandler.BadRequest(
-          "Корзина для этого пользователя уже существует"
-        );
+      // let cart;
+      const cart = await Cart.findOne({ userId });
+
+      const existingItemIndex = cart.cart.findIndex(
+        (item) => item.product.id === productId
+      );
+
+      if (existingItemIndex >= 0) {
+        if (cart.cart[existingItemIndex].unit === 1) {
+          cart.cart.splice(existingItemIndex, 1);
+          cart.cartAmount = Math.max(0, cart.cartAmount - sumToDec);
+          await cart.save();
+          return cart;
+        }
+
+        cart.cart[existingItemIndex].unit -= unit;
+        cart.cartAmount -= sumToDec;
+        await cart.save();
+        return cart;
+      } else {
+        throw new ErrorHandler.BadRequest("Товара нет в корзине");
       }
-      const cart = new Cart({ userId });
-      const savedCart = await cart.save();
-      return savedCart;
     } catch (error) {
       console.log(error);
     }
   }
 
-  async addCategory(name, description) {
+  async clearCart(userId) {
     try {
-      const category = new Category(name, description);
-      const savedCategory = await category.save();
-      return savedCategory;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async getCategory(id) {
-    try {
-      const category = await Category.findById(id).populate("products");
-      return category;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async getCategories() {
-    try {
-      const categories = await Category.find();
-      return categories;
+      const cart = await Cart.findOne({ userId });
+      await cart.updateOne({
+        cart: [],
+        cartAmount: 0,
+      });
+      return cart;
     } catch (error) {
       console.log(error);
     }
   }
 
-  async getProduct(id) {
+  async cancelOrder(orderId) {
     try {
-      const product = await Product.findById(id);
-      return product;
+      return await Order.findByIdAndUpdate(
+        { _id: orderId },
+        { status: STATUS.CANCELLED }
+      );
     } catch (error) {
       console.log(error);
     }
   }
-  async getProducts() {
+
+  async changeStatus(orderId, status) {
     try {
-      const products = await Product.find();
-      return products;
+      return await Order.findByIdAndUpdate(
+        { _id: orderId },
+        { status: status }
+      );
     } catch (error) {
       console.log(error);
     }

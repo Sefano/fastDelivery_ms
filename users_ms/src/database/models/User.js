@@ -23,8 +23,8 @@ const UserSchema = new Schema(
     cartAmount: { type: Number, default: 0 },
     orders: [
       {
-        id: { type: String, required: true },
-        amount: { type: String, required: true },
+        orderId: { type: String, required: true },
+        amount: { type: Number, required: true },
         date: { type: String, required: true },
         status: { type: String, required: true },
       },

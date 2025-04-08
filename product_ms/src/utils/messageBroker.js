@@ -29,14 +29,14 @@ export const PublishMessage = async (channel, binding_key, message) => {
 };
 
 //subscribe msg
-export const SubscribeMessage = async (channel, serice, binding_key) => {
-  const appQueue = await channel.assertQueue("QUEUE_NAME");
+// export const SubscribeMessage = async (channel, serice, binding_key) => {
+//   const appQueue = await channel.assertQueue("QUEUE_NAME");
 
-  channel.bindQueue(appQueue.queue, process.env.EXCHANGE_NAME, binding_key);
+//   channel.bindQueue(appQueue.queue, process.env.EXCHANGE_NAME, binding_key);
 
-  channel.consume(appQueue.queue, (data) => {
-    console.log("Получены данные");
-    console.log(data.content.toString());
-    channel.ack(data);
-  });
-};
+//   channel.consume(appQueue.queue, (data) => {
+//     console.log("Получены данные");
+//     console.log(data.content.toString());
+//     channel.ack(data);
+//   });
+// };

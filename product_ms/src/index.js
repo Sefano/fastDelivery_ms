@@ -6,6 +6,8 @@ import cors from "cors";
 import fastifyMiddie from "@fastify/middie";
 import isAuth from "./api/middlewares/auth.js";
 import { CreateChannel } from "./utils/messageBroker.js";
+import { S3Client } from "@aws-sdk/client-s3";
+import fastifyMultipart from "@fastify/multipart";
 
 const PORT = process.env.MS_PORT;
 
@@ -15,9 +17,25 @@ const app = Fastify({
 
 //middlewares
 await app.register(fastifyMiddie);
+await app.register(fastifyMultipart, {
+  limits: {
+    fileSize: 10000000,
+  },
+  attachFieldsToBody: true,
+});
+
 app.use(cors());
 
 const channel = await CreateChannel();
+
+export const s3Client = new S3Client({
+  region: process.env.region,
+  endpoint: process.env.endpoint_url,
+  credentials: {
+    accessKeyId: process.env.aws_access_key_id,
+    secretAccessKey: process.env.aws_secret_access_key,
+  },
+});
 
 productAPI(app, channel);
 

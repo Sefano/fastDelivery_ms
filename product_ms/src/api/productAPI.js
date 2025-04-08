@@ -3,18 +3,64 @@ import isAuth from "./middlewares/auth.js";
 import { productBody, caregoryBody } from "../utils/validation.js";
 import ROLES from "../../../users_ms/src/utils/roles.js";
 import { PublishMessage } from "../utils/messageBroker.js";
+import { uploadFile, uploadImage } from "../s3/imageHandler.js";
+import { pipeline } from "node:stream/promises";
+import fs from "fs";
 
 export default (app, channel) => {
   const service = new ProductService();
+
+  app.post("/testProduct", async (request, reply) => {
+    try {
+      const image = request.body.image;
+
+      const { name, description, category, price } = request.body;
+
+      image.filename = `${name.value}_${category.value.split(" ").join("")}`;
+
+      const buffer = image._buf;
+      const filename = image.filename;
+      const type = image.mimetype;
+
+      const [s3Upload, data] = await Promise.all([
+        uploadImage(filename, buffer, type),
+        service.addProduct({
+          name: name.value,
+          description: description.value,
+          category: category.value,
+          price: price.value,
+          image: filename,
+        }),
+      ]);
+
+      // const data = await service.addProduct({
+      //   name: name.value,
+      //   description: description.value,
+      //   category: category.value,
+      //   price: price.value,
+      //   image: filename,
+      // });
+
+      // await uploadImage(filename, buffer, type);
+      return reply.send(data);
+      return reply.send(data);
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
   app.post(
     "/product",
     { schema: productBody, preParsing: [isAuth] },
     async (request, reply) => {
       try {
-        if (request.user.role !== (ROLES.MANAGER || ROLES.ADMIN)) {
+        const permission =
+          request.user.role === ROLES.MANAGER ||
+          request.user.role === ROLES.ADMIN;
+        if (!permission) {
           return reply.code(403).send({ message: "Недостаточно прав" });
         }
+
         const { name, description, category, price, image } = request.body;
         const data = await service.addProduct(
           name,
@@ -23,6 +69,7 @@ export default (app, channel) => {
           price,
           image
         );
+        await uploadFile(name);
         return reply.send(data);
       } catch (error) {
         console.log(error);
@@ -78,32 +125,6 @@ export default (app, channel) => {
   app.get("/products", async (request, reply) => {
     try {
       const data = await service.getProducts();
-      return reply.send(data);
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  app.put("/cart/:id", { preParsing: [isAuth] }, async (request, reply) => {
-    try {
-      const userId = request.user.id;
-
-      const { id } = request.params;
-      const unit = request.body.unit;
-      const { _id, name, price, image } = await service.getProduct(id);
-      const data = {
-        event: "ADD_TO_CART",
-        data: { userId, productId: _id, name, price, image, unit },
-      };
-      PublishMessage(channel, process.env.PRODUCT_BIND, JSON.stringify(data));
-      return reply.send({ message: "Продукт добавлен в корзину" });
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  app.get("/cart", { preParsing: [isAuth] }, async (request, reply) => {
-    try {
       return reply.send(data);
     } catch (error) {
       console.log(error);

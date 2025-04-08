@@ -30,33 +30,36 @@ export const PublishMessage = async (channel, binding_key, message) => {
 
 //subscribe msg
 export const SubscribeMessage = async (channel, service) => {
-  const productQueue = await channel.assertQueue(process.env.QUEUE_NAME);
-
-  const cartQueue = await channel.assertQueue(process.env.CART_QUEUE);
-
-  channel.bindQueue(
-    cartQueue.queue,
-    process.env.EXCHANGE_NAME,
-    process.env.PRODUCT_BIND
+  const cart_orderQueue = await channel.assertQueue(
+    process.env.CART_ORDER_QUEUE
   );
 
+  // const cartQueue = await channel.assertQueue(process.env.CART_QUEUE);
+
   channel.bindQueue(
-    productQueue.queue,
+    cart_orderQueue.queue,
     process.env.EXCHANGE_NAME,
-    process.env.USER_CART_BIND
+    process.env.CART_ORDER_BIND
   );
 
-  channel.consume(productQueue.queue, (data) => {
+  // channel.bindQueue(
+  //   cartQueue.queue,
+  //   process.env.EXCHANGE_NAME,
+  //   process.env.USER_CART_BIND
+  // );
+
+  channel.consume(cart_orderQueue.queue, (data) => {
     console.log("Получены данные");
     console.log(data.content.toString());
     service.SubscribeEvents(data.content.toString());
     channel.ack(data);
   });
 
-  channel.consume(cartQueue.queue, (data) => {
-    console.log("Получены данные");
-    console.log(data.content.toString());
-    service.SubscribeEvents(data.content.toString());
-    channel.ack(data);
-  });
+  // channel.consume(cartQueue.queue, (data) => {
+  //   console.log("CART", cartQueue.queue);
+  //   console.log("Получены данные");
+  //   console.log(data.content.toString());
+  //   service.SubscribeEvents(data.content.toString());
+  //   channel.ack(data);
+  // });
 };

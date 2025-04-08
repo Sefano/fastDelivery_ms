@@ -18,6 +18,7 @@ export const userUpBody = {
       email: { type: "string" },
       password: { type: "string", minLength: 8 },
       name: { type: "string", minLength: 1 },
+      role: { type: "string" },
     },
     required: ["email", "password", "name"],
   },

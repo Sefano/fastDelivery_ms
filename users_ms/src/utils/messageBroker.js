@@ -30,23 +30,15 @@ export const PublishMessage = async (channel, binding_key, message) => {
 
 //subscribe msg
 export const SubscribeMessage = async (channel, service) => {
-  const productQueue = await channel.assertQueue(process.env.QUEUE_NAME);
-
-  const orderQueue = await channel.assertQueue(process.env.ORDER_QUEUE);
+  const usersQueue = await channel.assertQueue(process.env.USERS_QUEUE);
 
   channel.bindQueue(
-    productQueue.queue,
+    usersQueue.queue,
     process.env.EXCHANGE_NAME,
-    process.env.PRODUCT_BIND
+    process.env.USERS_BIND
   );
 
-  channel.bindQueue(
-    orderQueue.queue,
-    process.env.EXCHANGE_NAME,
-    process.env.ORDER_BIND
-  );
-
-  channel.consume(productQueue.queue, (data) => {
+  channel.consume(usersQueue.queue, (data) => {
     console.log("Получены данные");
     console.log(data.content.toString());
     service.SubscribeEvents(data.content.toString());

@@ -7,54 +7,36 @@ export default class OrderService {
   }
   async createOrder(userId, cart) {
     try {
-      const amount = cart.reduce((sum, item) => {
-        return sum + item.product.price * item.unit;
-      }, 0);
-      const order = await this.repository.createOrder(userId, cart, amount);
+      // const amount = cart.reduce((sum, item) => {
+      //   return sum + item.product.price * item.unit;
+      // }, 0);
+      const order = await this.repository.createOrder(userId);
       return order;
     } catch (error) {
       console.log(error);
     }
   }
 
-  async addCategory(name, description) {
+  async getOrder(orderId) {
     try {
-      const category = await this.repository.addCategory({
-        name,
-        description,
-      });
-      return category;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async getCategory(id) {
-    try {
-      return await this.repository.getCategory(id);
+      const order = await this.repository.getOrder(orderId);
+      return order;
     } catch (error) {
       console.log(error);
     }
   }
 
-  async getCategories() {
+  async cancelOrder(orderId) {
     try {
-      return await this.repository.getCategories();
+      return await this.repository.cancelOrder(orderId);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async getProduct(id) {
+  async cancelOrder(orderId, status) {
     try {
-      return await this.repository.getProduct(id);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async getProducts() {
-    try {
-      return await this.repository.getProducts();
+      return await this.repository.changeStatus(orderId, status);
     } catch (error) {
       console.log(error);
     }
@@ -93,9 +75,28 @@ export default class OrderService {
     }
   }
 
-  async createCart(userId) {
+  async deleteFromCart(userId, productId, unit, name, price, image) {
     try {
-      return await this.repository.createCart(userId);
+      const sumToDec = price * unit;
+      const cart = await this.repository.deleteFromCart(
+        userId,
+        productId,
+        name,
+        price,
+        image,
+        unit,
+        sumToDec
+      );
+      return cart;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async clearCart(userId) {
+    try {
+      const cart = await this.repository.clearCart(userId);
+      return cart;
     } catch (error) {
       console.log(error);
     }
@@ -121,9 +122,7 @@ export default class OrderService {
       case "ADD_TO_CART":
         this.addToCart(userId, productId, name, price, image, unit);
         break;
-      case "CREATE_CART":
-        this.createCart(userId);
-        break;
+
       default:
         break;
     }

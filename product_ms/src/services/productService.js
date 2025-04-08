@@ -5,7 +5,7 @@ export default class ProductService {
   constructor() {
     this.repository = new ProductRepository();
   }
-  async addProduct(name, description, category, price, image) {
+  async addProduct({ name, description, category, price, image }) {
     try {
       const product = await this.repository.addProduct(
         name,
@@ -59,21 +59,6 @@ export default class ProductService {
   async getProducts() {
     try {
       return await this.repository.getProducts();
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async addToCart(street, city, house, apartments, user) {
-    try {
-      const changeUser = await this.repository.addToCart(
-        street,
-        city,
-        house,
-        apartments,
-        user
-      );
-      return changeUser;
     } catch (error) {
       console.log(error);
     }

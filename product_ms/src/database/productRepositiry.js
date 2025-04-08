@@ -69,6 +69,4 @@ export default class ProductRepository {
       console.log(error);
     }
   }
-
-  async addToCart() {}
 }

@@ -9,16 +9,14 @@ export default (app, channel) => {
 
   app.post("/signup", { schema: userUpBody }, async (request, reply) => {
     try {
-      const { email, password, name } = request.body;
-      const userData = await service.SignUp(email, password, name);
-      console.log(userData);
+      const { email, password, name, role } = request.body;
+      const userData = await service.SignUp(email, password, name, role);
       const { id } = userData;
       const data = {
         event: "CREATE_CART",
         data: { userId: id },
       };
       console.log(data);
-      PublishMessage(channel, process.env.USER_CART_BIND, JSON.stringify(data));
       return reply.send(userData);
     } catch (error) {
       console.log(error);
