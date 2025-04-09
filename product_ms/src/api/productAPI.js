@@ -43,7 +43,6 @@ export default (app, channel) => {
 
       // await uploadImage(filename, buffer, type);
       return reply.send(data);
-      return reply.send(data);
     } catch (error) {
       console.log(error);
     }
