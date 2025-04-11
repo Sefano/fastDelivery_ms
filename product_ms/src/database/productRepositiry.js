@@ -21,6 +21,7 @@ export default class ProductRepository {
           },
         }
       );
+
       return savedProduct;
     } catch (error) {
       console.log(error);

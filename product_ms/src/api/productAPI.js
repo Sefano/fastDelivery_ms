@@ -48,50 +48,45 @@ export default (app, channel) => {
     }
   });
 
-  app.post(
-    "/product",
-    { schema: productBody, preParsing: [isAuth] },
-    async (request, reply) => {
-      try {
-        const permission =
-          request.user.role === ROLES.MANAGER ||
-          request.user.role === ROLES.ADMIN;
-        if (!permission) {
-          return reply.code(403).send({ message: "Недостаточно прав" });
-        }
-
-        const { name, description, category, price, image } = request.body;
-        const data = await service.addProduct(
-          name,
-          description,
-          category,
-          price,
-          image
-        );
-        await uploadFile(name);
-        return reply.send(data);
-      } catch (error) {
-        console.log(error);
+  app.post("/product", { schema: productBody }, async (request, reply) => {
+    try {
+      const permission =
+        request.user.role === ROLES.MANAGER ||
+        request.user.role === ROLES.ADMIN;
+      if (!permission) {
+        return reply.code(403).send({ message: "Недостаточно прав" });
       }
-    }
-  );
 
-  app.post(
-    "/category",
-    { schema: caregoryBody, preParsing: [isAuth] },
-    async (request, reply) => {
-      try {
-        if (request.user.role !== (ROLES.MANAGER || ROLES.ADMIN)) {
-          return reply.code(403).send({ message: "Недостаточно прав" });
-        }
-        const { name, description } = request.body;
-        const data = await service.addCategory(name, description);
-        return reply.send(data);
-      } catch (error) {
-        console.log(error);
-      }
+      const { name, description, category, price, image } = request.body;
+      const data = await service.addProduct(
+        name,
+        description,
+        category,
+        price,
+        image
+      );
+      await uploadFile(name);
+      return reply.send(data);
+    } catch (error) {
+      console.log(error);
     }
-  );
+  });
+
+  app.post("/category", { schema: caregoryBody }, async (request, reply) => {
+    try {
+      // const permission =
+      //   request.user.role === ROLES.MANAGER ||
+      //   request.user.role === ROLES.ADMIN;
+      // if (!permission) {
+      //   return reply.code(403).send({ message: "Недостаточно прав" });
+      // }
+      const { name, description } = request.body;
+      const data = await service.addCategory(name, description);
+      return reply.send(data);
+    } catch (error) {
+      console.log(error);
+    }
+  });
   app.get("/category/:id", async (request, reply) => {
     try {
       const { id } = request.params;
