@@ -1,4 +1,5 @@
 import ProductRepository from "../database/productRepositiry.js";
+import { getImageUrl } from "../s3/imageHandler.js";
 import ErrorHandler from "../utils/errorHandler.js";
 
 export default class ProductService {
@@ -58,7 +59,12 @@ export default class ProductService {
 
   async getProducts() {
     try {
-      return await this.repository.getProducts();
+      const produts = await this.repository.getProducts();
+      for (const product of produts) {
+        let imageUrl = await getImageUrl(product.image);
+        product.image = imageUrl;
+      }
+      return produts;
     } catch (error) {
       console.log(error);
     }

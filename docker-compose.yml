@@ -1,0 +1,7 @@
+services:
+  web:
+    build:
+      dockerfile: Dockerfile
+      context: ./proxy
+    ports:
+      - "80:8080"

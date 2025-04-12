@@ -65,6 +65,7 @@ export default class ProductRepository {
   async getProducts() {
     try {
       const products = await Product.find();
+
       return products;
     } catch (error) {
       console.log(error);

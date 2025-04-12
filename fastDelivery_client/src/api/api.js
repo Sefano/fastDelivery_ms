@@ -22,3 +22,9 @@ export const postProduct = async (formData) => {
   );
   return response.data;
 };
+
+export const getProducts = async () => {
+  const response = await axios.get("http://localhost:4002/products");
+  console.log(response.data);
+  return response.data;
+};
