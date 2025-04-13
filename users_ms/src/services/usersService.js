@@ -32,7 +32,14 @@ export default class UserService {
         id: user._id,
         role: user.role,
       });
-      return { id: user._id, token };
+      return {
+        user: {
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
+        token,
+      };
     } catch (error) {
       console.log(error);
     }
@@ -58,7 +65,14 @@ export default class UserService {
         id: userExsist._id,
         role: userExsist.role,
       });
-      return { id: userExsist._id, token };
+      return {
+        user: {
+          email: userExsist.email,
+          name: userExsist.name,
+          role: userExsist.role,
+        },
+        token,
+      };
     } catch (error) {
       console.log(error);
     }

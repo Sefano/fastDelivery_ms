@@ -1,5 +1,24 @@
 import axios from "axios";
 
+export const signUp = async ({ email, password, name }) => {
+  const response = await axios.post("http://localhost:4001/signup", {
+    email,
+    password,
+    name,
+  });
+
+  return response.data;
+};
+
+export const signIn = async ({ email, password }) => {
+  const response = await axios.post("http://localhost:4001/signin", {
+    email,
+    password,
+  });
+
+  return response.data;
+};
+
 export const fetchCategories = async () => {
   const response = await axios.get("http://localhost:4002/categories");
 
