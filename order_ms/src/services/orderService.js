@@ -1,4 +1,5 @@
 import OrderRepository from "../database/orderRepositiry.js";
+import { getImageUrl } from "../s3/imageHandler.js";
 import ErrorHandler from "../utils/errorHandler.js";
 
 export default class OrderService {
@@ -78,6 +79,7 @@ export default class OrderService {
   async deleteFromCart(userId, productId, unit, name, price, image) {
     try {
       const sumToDec = price * unit;
+
       const cart = await this.repository.deleteFromCart(
         userId,
         productId,
@@ -96,6 +98,19 @@ export default class OrderService {
   async clearCart(userId) {
     try {
       const cart = await this.repository.clearCart(userId);
+      return cart;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getCart(userId) {
+    try {
+      const cart = await this.repository.getCart(userId);
+      // for (const product of cart.cart) {
+      //   let imageUrl = await getImageUrl(product.product.image);
+      //   product.product.image = imageUrl;
+      // }
       return cart;
     } catch (error) {
       console.log(error);

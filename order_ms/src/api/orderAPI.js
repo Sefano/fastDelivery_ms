@@ -3,6 +3,7 @@ import isAuth from "./middlewares/auth.js";
 import { productBody, caregoryBody } from "../utils/validation.js";
 import ROLES from "../../../users_ms/src/utils/roles.js";
 import { PublishMessage, SubscribeMessage } from "../utils/messageBroker.js";
+import { getImageUrl } from "../s3/imageHandler.js";
 
 export default (app, channel) => {
   const service = new OrderService();
@@ -172,5 +173,23 @@ export default (app, channel) => {
     } catch (error) {
       console.log(error);
     }
+  });
+
+  app.get("/cart", { preParsing: [isAuth] }, async (request, reply) => {
+    const userId = request.user.id;
+    const cart = await service.getCart(userId);
+    if (!cart) {
+      return reply.send({ message: "Нет корзины" });
+    }
+    let updatedCart = cart.toObject();
+    for (const item of updatedCart.cart) {
+      if (item.product.urlExpiresIn < Date.now() + 3600 * 1000) {
+        const updatedUrl = await getImageUrl(item.product.image);
+        item.product.imgUrl = updatedUrl;
+        item.product.urlExpiresIn = Date.now() + 24 * 3600 * 1000;
+      }
+    }
+
+    return reply.send(updatedCart);
   });
 };

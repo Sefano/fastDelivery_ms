@@ -22,11 +22,13 @@ export const generateToken = async (payload) => {
 
 export const validateSignature = async (token) => {
   try {
-    console.log(token);
     const payload = await jwt.verify(
       token.split(" ")[1],
       process.env.JWT_SECRET
     );
+    if (!payload) {
+      return null;
+    }
     return payload;
   } catch (error) {
     console.log(error);

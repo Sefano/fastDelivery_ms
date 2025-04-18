@@ -1,6 +1,7 @@
 import ErrorHandler from "../utils/errorHandler.js";
 import { Cart, Order } from "./models/exports.js";
 import STATUS from "../utils/status.js";
+import { getImageUrl } from "../s3/imageHandler.js";
 export default class OrderRepository {
   async createOrder(userId) {
     try {
@@ -41,6 +42,7 @@ export default class OrderRepository {
         cart = new Cart({
           userId,
         });
+
         await cart.save();
       }
 
@@ -56,20 +58,34 @@ export default class OrderRepository {
         return cart;
       }
 
-      const updatedCart = await cart.updateOne({
-        $push: {
-          cart: {
-            product: {
-              id: productId,
-              name,
-              price,
-              image,
-            },
-            unit,
-          },
+      // await cart.updateOne({
+      //   $push: {
+      //     cart: {
+      //       product: {
+      //         id: productId,
+      //         name,
+      //         price,
+      //         image,
+      //       },
+      //       unit,
+      //     },
+      //   },
+      //   cartAmount: cart.cartAmount + sumToAdd,
+      // });
+      const imageUrl = await getImageUrl(image);
+      cart.cart.push({
+        product: {
+          id: productId,
+          name,
+          price,
+          image,
+          imgUrl: imageUrl,
+          urlExpiresIn: Date.now() + 24 * 3600 * 1000,
         },
-        cartAmount: cart.cartAmount + sumToAdd,
+        unit,
       });
+      cart.cartAmount = cart.cartAmount + sumToAdd;
+      const updatedCart = await cart.save();
       return updatedCart;
     } catch (error) {
       console.log(error);
@@ -94,6 +110,7 @@ export default class OrderRepository {
         }
 
         cart.cart[existingItemIndex].unit -= unit;
+        cart.cart[existingItemIndex].product.price -= sumToDec;
         cart.cartAmount -= sumToDec;
         await cart.save();
         return cart;
@@ -135,6 +152,17 @@ export default class OrderRepository {
         { _id: orderId },
         { status: status }
       );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getCart(userId) {
+    try {
+      const cart = await Cart.findOne({
+        userId: userId,
+      });
+      return cart;
     } catch (error) {
       console.log(error);
     }

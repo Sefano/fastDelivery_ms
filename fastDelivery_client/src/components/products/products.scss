@@ -1,6 +1,28 @@
 .wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+.products {
   display: grid;
   grid-template-columns: auto auto auto auto auto;
-  margin-top: 100px;
   gap: 10px;
+}
+
+.order {
+  width: 350px;
+  height: calc(100vh - 120px);
+  position: sticky;
+  top: 120px;
+  background-color: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  &__divider {
+    display: block;
+    border: 1px solid rgba(176, 172, 172, 0.672);
+    margin: 0 5px;
+  }
 }

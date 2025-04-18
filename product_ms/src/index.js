@@ -8,6 +8,7 @@ import isAuth from "./api/middlewares/auth.js";
 import { CreateChannel } from "./utils/messageBroker.js";
 import { S3Client } from "@aws-sdk/client-s3";
 import fastifyMultipart from "@fastify/multipart";
+import redisClient from "./redis/redis.js";
 
 const PORT = process.env.MS_PORT;
 
@@ -31,8 +32,10 @@ app.use(
   })
 );
 
+//rabbitMqBroker
 const channel = await CreateChannel();
 
+//s3 yandexCient
 export const s3Client = new S3Client({
   region: process.env.region,
   endpoint: process.env.endpoint_url,
@@ -42,11 +45,23 @@ export const s3Client = new S3Client({
   },
 });
 
+//redis
+redisClient.on("error", (err) => console.log("Redis Client Error", err));
+redisClient.on("ready", () => console.log("Redis запущен"));
+
+//router
 productAPI(app, channel);
 
 const start = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL);
+    // await mongoose.model("product").syncIndexes();
+    // await mongoose
+    //   .model("product")
+    //   .listIndexes()
+    //   .then(console.log)
+    //   .catch(console.error);
+    await redisClient.connect();
     app.listen({ port: PORT }, () => {
       console.log(`Сервер запущен на порту ${PORT}`);
     });

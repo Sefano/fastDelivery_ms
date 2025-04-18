@@ -4,6 +4,7 @@
   width: 200px;
 
   &__image {
+    margin: 0 auto;
     height: 200px;
     width: 180px;
     img {
@@ -18,7 +19,8 @@
   }
   &__btns {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
     &-add {
       appearance: none;
       background-color: transparent;

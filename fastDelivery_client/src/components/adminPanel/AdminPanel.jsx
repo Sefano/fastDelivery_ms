@@ -4,9 +4,12 @@ import React, { useRef, useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { fetchCategories, postCat, postProduct } from "../../api/api";
+import { useSelector } from "react-redux";
 
 const AdminPanel = () => {
   const queryClient = useQueryClient();
+
+  const user = useSelector((state) => state.user.currentUser);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");

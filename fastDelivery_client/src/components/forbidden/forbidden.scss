@@ -1,0 +1,13 @@
+.forbidden {
+  margin-top: 25vh;
+  align-items: center;
+  text-align: center;
+  &__code {
+    font-size: 168px;
+    font-weight: 800;
+  }
+  &__message {
+    font-size: 80px;
+    font-weight: 600;
+  }
+}

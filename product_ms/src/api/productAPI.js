@@ -3,7 +3,7 @@ import isAuth from "./middlewares/auth.js";
 import { productBody, caregoryBody } from "../utils/validation.js";
 import ROLES from "../../../users_ms/src/utils/roles.js";
 import { PublishMessage } from "../utils/messageBroker.js";
-import { uploadFile, uploadImage } from "../s3/imageHandler.js";
+import { getImageUrl, uploadFile, uploadImage } from "../s3/imageHandler.js";
 import { pipeline } from "node:stream/promises";
 import fs from "fs";
 
@@ -119,6 +119,25 @@ export default (app, channel) => {
   app.get("/products", async (request, reply) => {
     try {
       const data = await service.getProducts();
+      return reply.send(data);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  app.get("/products-min", async (request, reply) => {
+    try {
+      const data = await service.getProductsMin();
+      return reply.send(data);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  app.get("/getimage/:name", async (request, reply) => {
+    try {
+      const { name } = request.params;
+
+      const data = await getImageUrl(name);
       return reply.send(data);
     } catch (error) {
       console.log(error);

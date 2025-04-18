@@ -1,5 +1,6 @@
 import { User } from "./models/exports.js";
 import STATUS from "../utils/status.js";
+import ErrorHandler from "../utils/errorHandler.js";
 
 export default class UsersRepository {
   async addUser({ email, password, name, salt, role }) {
@@ -31,6 +32,7 @@ export default class UsersRepository {
   async findUser(email) {
     try {
       const user = await User.findOne({ email: email });
+
       return user;
     } catch (error) {
       console.log(error);
@@ -102,11 +104,14 @@ export default class UsersRepository {
       if (existingItemIndex >= 0) {
         if (user.cart[existingItemIndex].unit === 1) {
           user.cart.splice(existingItemIndex, 1);
-          user.cartAmount = Math.max(0, cart.cartAmount - sumToDec);
+          user.cartAmount = Math.max(0, user.cartAmount - sumToDec);
           await user.save();
           return user;
         }
+        console.log(user.cart[1].product);
+
         user.cart[existingItemIndex].unit -= unit;
+        user.cart[existingItemIndex].product.price -= sumToDec;
         user.cartAmount -= sumToDec;
         await user.save();
         return user;

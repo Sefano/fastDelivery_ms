@@ -1,4 +1,5 @@
 import UsersRepository from "../database/usersRepositiry.js";
+import { getImageUrl } from "../s3/imageHandler.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import {
   generatePassword,
@@ -73,6 +74,22 @@ export default class UserService {
         },
         token,
       };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async checkAuth(user) {
+    try {
+      const email = user.email;
+      const userExist = await this.repository.findUser(email);
+      const data = {
+        email: userExist.email,
+        name: userExist.name,
+        role: userExist.role,
+      };
+
+      return data;
     } catch (error) {
       console.log(error);
     }

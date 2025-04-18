@@ -33,6 +33,19 @@ export default (app, channel) => {
     }
   });
 
+  app.get("/auth", { preParsing: [isAuth] }, async (request, reply) => {
+    try {
+      const user = request.user;
+      if (!user) {
+        return reply.code(401).send({ message: "Пользователь не авторизован" });
+      }
+      const data = await service.checkAuth(user);
+      return reply.code(200).send(data);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
   app.put(
     "/address",
     { schema: addressBody, preParsing: [isAuth] },

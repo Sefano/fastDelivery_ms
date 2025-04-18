@@ -10,6 +10,8 @@ const CartSchema = new Schema(
           name: { type: String },
           image: { type: String },
           price: { type: Number },
+          imgUrl: { type: String },
+          urlExpiresIn: { type: Number },
         },
         unit: { type: Number },
       },

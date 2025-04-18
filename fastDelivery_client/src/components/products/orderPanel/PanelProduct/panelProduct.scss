@@ -1,0 +1,54 @@
+.panel-product {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  &__img {
+    display: block;
+    width: 100px;
+  }
+  &__desc {
+    width: 100px;
+    display: block;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  &__btns {
+    font-size: 18px;
+    display: flex;
+    justify-content: space-between;
+    width: 30%;
+    background-color: rgba(176, 172, 172, 0.4);
+    border-radius: 10px;
+    &_single {
+      border-radius: 10px;
+      cursor: pointer;
+      width: 32px;
+      border: none;
+      background: none;
+      &.add {
+        &:hover {
+          background: linear-gradient(
+            90deg,
+            rgba(176, 172, 172, 0.1) 9%,
+            rgba(168, 222, 230, 1) 73%,
+            rgba(100, 219, 237, 1) 94%
+          );
+        }
+      }
+      &.del {
+        &:hover {
+          background: linear-gradient(
+            272deg,
+            rgba(176, 172, 172, 0.1) 9%,
+            rgba(168, 222, 230, 1) 73%,
+            rgba(100, 219, 237, 1) 94%
+          );
+        }
+      }
+    }
+  }
+}

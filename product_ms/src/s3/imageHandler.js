@@ -24,6 +24,7 @@ export const uploadImage = async (name, buffer, type) => {
       Key: name,
       Body: buffer,
       ContentType: type,
+      CacheControl: "max-age=86400, immutable",
     })
   );
 };
@@ -32,6 +33,7 @@ export const getImageUrl = async (key) => {
   const command = new GetObjectCommand({
     Bucket: "fastdelivery",
     Key: key,
+    ResponseCacheControl: "max-age=86400, immutable",
   });
   const url = await getSignedUrl(s3Client, command, {
     expiresIn: 60 * 60 * 24,

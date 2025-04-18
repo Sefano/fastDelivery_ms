@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "./axios";
 
 export const signUp = async ({ email, password, name }) => {
   const response = await axios.post("http://localhost:4001/signup", {
@@ -6,6 +7,8 @@ export const signUp = async ({ email, password, name }) => {
     password,
     name,
   });
+
+  localStorage.setItem("token", response.data.token);
 
   return response.data;
 };
@@ -15,7 +18,7 @@ export const signIn = async ({ email, password }) => {
     email,
     password,
   });
-
+  localStorage.setItem("token", response.data.token);
   return response.data;
 };
 

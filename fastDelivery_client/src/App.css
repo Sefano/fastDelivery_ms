@@ -2,12 +2,17 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "Nunito", sans-serif;
+  font-family: "Rubik";
+  /* font-family: "Nunito", sans-serif; */
+  /* font-family: url("./fonts/Rubik-VariableFont_wght.ttf") format("woff2"); */
 }
-
+@font-face {
+  font-family: "Rubik";
+  src: url("./fonts/Rubik-VariableFont_wght.ttf");
+}
 .container {
-  width: 1200px;
-  margin: 0 auto;
+  width: 1600px;
+  margin: 120px auto;
   display: flex;
   align-items: center;
   justify-content: center;
