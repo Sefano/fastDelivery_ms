@@ -19,4 +19,15 @@ const ProductSchema = new Schema(
   }
 );
 
+ProductSchema.index({ category: 1 }).index(
+  {
+    name: "text",
+    description: "text",
+  },
+  {
+    default_language: "russian",
+    language_override: "russian",
+  }
+);
+
 export default model("product", ProductSchema);

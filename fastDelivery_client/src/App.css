@@ -17,3 +17,8 @@
   align-items: center;
   justify-content: center;
 }
+
+.minorText {
+  font-size: 14px;
+  font-weight: 300;
+}

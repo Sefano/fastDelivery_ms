@@ -46,6 +46,18 @@ export default (app, channel) => {
     }
   );
 
+  //Получить все заказы
+  app.get("/orders", { preParsing: [isAuth] }, async (request, reply) => {
+    try {
+      const userId = request.user.id;
+      const data = await service.getOrders(userId);
+
+      return reply.send(data);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
   //Отменить заказ
   app.put(
     "/order/:orderId",

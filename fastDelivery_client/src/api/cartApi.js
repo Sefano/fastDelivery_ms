@@ -30,3 +30,11 @@ export const removeFromCart = async ({ action, productId, unit, price }) => {
 
   return response.data;
 };
+
+export const clearCart = async ({ action }) => {
+  const response = await api.put("http://localhost:4003/cart", {
+    action,
+  });
+
+  return response.data;
+};

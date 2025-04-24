@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { fetchCategories, postCat, postProduct } from "../../api/api";
 import { useSelector } from "react-redux";
+import { useCategories } from "../../hooks/useCategories";
 
 const AdminPanel = () => {
   const queryClient = useQueryClient();
@@ -24,10 +25,7 @@ const AdminPanel = () => {
   const [image, setImage] = useState(null);
   const inputImageRef = useRef(null);
 
-  const query = useQuery({
-    queryKey: ["categories"],
-    queryFn: fetchCategories,
-  });
+  const categories = useCategories();
 
   const catMutation = useMutation({
     mutationFn: postCat,
@@ -67,7 +65,7 @@ const AdminPanel = () => {
     data,
     status,
     fetchStatus,
-  } = query;
+  } = categories;
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];

@@ -1,4 +1,5 @@
 import OrderRepository from "../database/orderRepositiry.js";
+import redisClient from "../redis/redis.js";
 import { getImageUrl } from "../s3/imageHandler.js";
 import ErrorHandler from "../utils/errorHandler.js";
 
@@ -21,7 +22,57 @@ export default class OrderService {
   async getOrder(orderId) {
     try {
       const order = await this.repository.getOrder(orderId);
-      return order;
+
+      const imageKeys = order.products.map((product) => product.product.image);
+
+      const cachedUrls = await redisClient.mGet(imageKeys);
+
+      const productsWithUrl = await Promise.all(
+        order.products.map(async (product, index) => {
+          let imageUrl;
+
+          const cachedImageUrl = cachedUrls[index];
+          if (cachedImageUrl) {
+            imageUrl = JSON.parse(cachedImageUrl);
+          } else {
+            imageUrl = await getImageUrl(product.product.image);
+            await redisClient.set(
+              product.product.image,
+              JSON.stringify(imageUrl),
+              {
+                EX: 60 * 60 * 23,
+              }
+            );
+          }
+
+          return {
+            ...product.toObject(),
+            product: {
+              ...product.product.toObject(),
+              imageUrl,
+            },
+          };
+        })
+      );
+
+      return {
+        ...order.toObject(),
+        products: productsWithUrl,
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getOrders(userId) {
+    try {
+      let data;
+      data = await this.repository.getOrders(userId);
+      if (!data) {
+        data = [];
+        return data;
+      }
+      return data;
     } catch (error) {
       console.log(error);
     }
@@ -29,13 +80,49 @@ export default class OrderService {
 
   async cancelOrder(orderId) {
     try {
-      return await this.repository.cancelOrder(orderId);
+      const order = await this.repository.cancelOrder(orderId);
+      const imageKeys = order.products.map((product) => product.product.image);
+
+      const cachedUrls = await redisClient.mGet(imageKeys);
+
+      const productsWithUrl = await Promise.all(
+        order.products.map(async (product, index) => {
+          let imageUrl;
+
+          const cachedImageUrl = cachedUrls[index];
+          if (cachedImageUrl) {
+            imageUrl = JSON.parse(cachedImageUrl);
+          } else {
+            imageUrl = await getImageUrl(product.product.image);
+            await redisClient.set(
+              product.product.image,
+              JSON.stringify(imageUrl),
+              {
+                EX: 60 * 60 * 23,
+              }
+            );
+          }
+
+          return {
+            ...product.toObject(),
+            product: {
+              ...product.product.toObject(),
+              imageUrl,
+            },
+          };
+        })
+      );
+
+      return {
+        ...order.toObject(),
+        products: productsWithUrl,
+      };
     } catch (error) {
       console.log(error);
     }
   }
 
-  async cancelOrder(orderId, status) {
+  async changeStatus(orderId, status) {
     try {
       return await this.repository.changeStatus(orderId, status);
     } catch (error) {

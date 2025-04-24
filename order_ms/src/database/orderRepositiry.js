@@ -34,6 +34,17 @@ export default class OrderRepository {
     }
   }
 
+  async getOrders(userId) {
+    try {
+      const orders = await Order.find({
+        userId: userId,
+      });
+      return orders;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async addToCart(userId, productId, name, price, image, unit, sumToAdd) {
     try {
       let cart;
@@ -124,12 +135,17 @@ export default class OrderRepository {
 
   async clearCart(userId) {
     try {
-      const cart = await Cart.findOne({ userId });
-      await cart.updateOne({
-        cart: [],
-        cartAmount: 0,
-      });
-      return cart;
+      const clearedCart = await Cart.findOneAndUpdate(
+        {
+          userId: userId,
+        },
+        {
+          cart: [],
+          cartAmount: 0,
+        },
+        { returnDocument: "after" }
+      );
+      return clearedCart;
     } catch (error) {
       console.log(error);
     }
@@ -139,7 +155,10 @@ export default class OrderRepository {
     try {
       return await Order.findByIdAndUpdate(
         { _id: orderId },
-        { status: STATUS.CANCELLED }
+        { status: STATUS.CANCELLED },
+        {
+          returnDocument: "after",
+        }
       );
     } catch (error) {
       console.log(error);

@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import "./product.scss";
 import burger from "../../../assets/brg.jpg";
-import { useProductImage } from "../../../hooks/useProductImage";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart } from "../../../api/cartApi";
 import { useCart } from "../../../api/useCart";

@@ -55,12 +55,12 @@ productAPI(app, channel);
 const start = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL);
-    // await mongoose.model("product").syncIndexes();
-    // await mongoose
-    //   .model("product")
-    //   .listIndexes()
-    //   .then(console.log)
-    //   .catch(console.error);
+    await mongoose.model("product").syncIndexes();
+    await mongoose
+      .model("product")
+      .listIndexes()
+      .then(console.log)
+      .catch(console.error);
     await redisClient.connect();
     app.listen({ port: PORT }, () => {
       console.log(`Сервер запущен на порту ${PORT}`);

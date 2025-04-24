@@ -7,6 +7,7 @@ import fastifyMiddie from "@fastify/middie";
 import isAuth from "./api/middlewares/auth.js";
 import { CreateChannel } from "./utils/messageBroker.js";
 import { S3Client } from "@aws-sdk/client-s3";
+import redisClient from "./redis/redis.js";
 
 const PORT = process.env.MS_PORT;
 
@@ -34,11 +35,15 @@ export const s3Client = new S3Client({
   },
 });
 
+redisClient.on("error", (err) => console.log("Redis Client Error", err));
+redisClient.on("ready", () => console.log("Redis запущен"));
+
 orderAPI(app, channel);
 
 const start = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL);
+    await redisClient.connect();
     app.listen({ port: PORT }, () => {
       console.log(`Сервер запущен на порту ${PORT}`);
     });

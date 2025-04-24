@@ -9,6 +9,7 @@ import { useAuth } from "./api/useAuth";
 import Forbidden from "./components/forbidden/Forbidden";
 import { AdminRoute } from "./components/roleRoute/AdminRoute";
 import Mock from "./components/Mock";
+import Orders from "./components/orders/Orders";
 
 function App() {
   useAuth();
@@ -21,6 +22,7 @@ function App() {
           <Route Component={AdminRoute}>
             <Route path="/admin" Component={AdminPanel} />
           </Route>
+          <Route path="/orders" Component={Orders} />
           <Route path="/forbidden" Component={Forbidden} />
           <Route path="/auth" Component={Auth} />
           <Route path="/products" Component={Products} />

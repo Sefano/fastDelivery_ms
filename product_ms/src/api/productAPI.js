@@ -118,12 +118,34 @@ export default (app, channel) => {
   });
   app.get("/products", async (request, reply) => {
     try {
-      const data = await service.getProducts();
+      const { page, limit, categories, search } = request.query;
+      const skip = (page - 1) * limit;
+      console.log(request.query);
+
+      if (categories) {
+        const data = await service.getFilteredProducts(categories, limit, skip);
+        return reply.send(data);
+      }
+      if (search) {
+        const data = await service.getProductsByName(search, limit, skip);
+        return reply.send(data);
+      }
+
+      const data = await service.getProducts(limit, skip);
       return reply.send(data);
     } catch (error) {
       console.log(error);
     }
   });
+  // app.get("/products/:categoryId", async (request, reply) => {
+  //   try {
+  //     const { categoryId } = request.params;
+  //     const data = await service.getFilteredProducts(categoryId);
+  //     return reply.send(data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // });
   app.get("/products-min", async (request, reply) => {
     try {
       const data = await service.getProductsMin();

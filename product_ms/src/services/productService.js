@@ -58,15 +58,16 @@ export default class ProductService {
     }
   }
 
-  async getProducts() {
+  async getProducts(limit, skip) {
     try {
-      const products = await this.repository.getProducts();
+      const data = await this.repository.getProducts(limit, skip);
+
+      const products = data.data;
 
       //кеш ссылок в редисе
 
       const imageKeys = products.map((product) => product.image);
       const cachedUrls = await redisClient.mGet(imageKeys);
-      console.log(cachedUrls);
 
       const objProducts = await Promise.all(
         products.map(async (product, index) => {
@@ -101,7 +102,93 @@ export default class ProductService {
       //   })
       // );
 
-      return objProducts;
+      return { products: objProducts, meta: data.meta };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getFilteredProducts(categories, limit, skip) {
+    try {
+      const categoryIds = categories.split(",").map((id) => id);
+
+      const data = await this.repository.getFilteredProducts(
+        categoryIds,
+        limit,
+        skip
+      );
+      const products = data.data;
+      if (products.length === 0) {
+        return { products: [], meta: data.meta };
+      }
+
+      //кеш ссылок в редисе
+
+      const imageKeys = products.map((product) => product.image);
+      const cachedUrls = await redisClient.mGet(imageKeys);
+
+      const objProducts = await Promise.all(
+        products.map(async (product, index) => {
+          let imageUrl;
+
+          const cachedImageUrl = cachedUrls[index];
+          if (cachedImageUrl) {
+            imageUrl = JSON.parse(cachedImageUrl);
+          } else {
+            imageUrl = await getImageUrl(product.image);
+            await redisClient.set(product.image, JSON.stringify(imageUrl), {
+              EX: 60 * 60 * 23,
+            });
+          }
+
+          return {
+            ...product.toObject(),
+            imageUrl,
+          };
+        })
+      );
+
+      return { products: objProducts, meta: data.meta };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getProductsByName(search, limit, skip) {
+    try {
+      const data = await this.repository.getProductsByName(search, limit, skip);
+      const products = data.data;
+      if (products.length === 0) {
+        return { products: [], meta: data.meta };
+      }
+
+      //кеш ссылок в редисе
+
+      const imageKeys = products.map((product) => product.image);
+      const cachedUrls = await redisClient.mGet(imageKeys);
+
+      const objProducts = await Promise.all(
+        products.map(async (product, index) => {
+          let imageUrl;
+
+          const cachedImageUrl = cachedUrls[index];
+          if (cachedImageUrl) {
+            imageUrl = JSON.parse(cachedImageUrl);
+          } else {
+            imageUrl = await getImageUrl(product.image);
+            await redisClient.set(product.image, JSON.stringify(imageUrl), {
+              EX: 60 * 60 * 23,
+            });
+          }
+
+          return {
+            ...product.toObject(),
+            imageUrl,
+          };
+        })
+      );
+
+      return { products: objProducts, meta: data.meta };
     } catch (error) {
       console.log(error);
     }

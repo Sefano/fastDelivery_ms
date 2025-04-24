@@ -45,8 +45,21 @@ export const postProduct = async (formData) => {
   return response.data;
 };
 
-export const getProducts = async () => {
-  const response = await axios.get("http://localhost:4002/products");
+export const getProducts = async (page, limit, filters, search) => {
+  console.log(filters);
+  const params = new URLSearchParams();
+  if (filters.length > 0) {
+    params.append("categories", filters.join(","));
+  }
+  if (search) {
+    params.append("search", search);
+  }
+  params.append("page", page);
+  params.append("limit", limit);
+  const stringParams = params.toString();
+  const response = await axios.get(
+    `http://localhost:4002/products?${stringParams}`
+  );
   console.log(response.data);
   return response.data;
 };
