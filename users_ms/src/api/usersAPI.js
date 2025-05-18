@@ -33,6 +33,23 @@ export default (app, channel) => {
     }
   });
 
+  app.get("/logout", { preParsing: [isAuth] }, async (request, reply) => {
+    try {
+      const token =
+        request.headers.authorization || request.headers.Authorization;
+      if (!token) {
+        return reply.code(400).send({ message: "Отсутствует токен" });
+      }
+      const success = await service.logout(token);
+      if (!success) {
+        return reply.code(400).send({ message: "Неверный токен" });
+      }
+      return reply.send({ message: "Вы вышли из аккаунта" });
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
   app.get("/auth", { preParsing: [isAuth] }, async (request, reply) => {
     try {
       const user = request.user;

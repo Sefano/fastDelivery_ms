@@ -15,5 +15,5 @@ aws_secret_access_key = ключ доступа из панели управле
 endpoint_url = "https://storage.yandexcloud.net"
 region = "ru-central1"
 
-При поднятии контейнера с портом 8080, можно обращаться к микросервисам по пути http://localhost:8080/api/users/signin (пример)
+При поднятом контейнере с портом 8080, можно обращаться к микросервисам по пути http://localhost:8080/api/users/signin (пример)
 При отдельном запуске без докера путь будет таким - http://localhost:4001/signin

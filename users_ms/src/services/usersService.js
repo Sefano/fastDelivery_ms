@@ -1,3 +1,4 @@
+import redisClient from "../../redis/redis.js";
 import UsersRepository from "../database/usersRepositiry.js";
 import { getImageUrl } from "../s3/imageHandler.js";
 import ErrorHandler from "../utils/errorHandler.js";
@@ -6,6 +7,7 @@ import {
   generateSalt,
   generateToken,
   validatePassword,
+  validateSignature,
 } from "../utils/usersUtils.js";
 
 export default class UserService {
@@ -79,6 +81,21 @@ export default class UserService {
     }
   }
 
+  async logout(token) {
+    try {
+      const decoded = await validateSignature(token);
+      const blToken = token.split(" ")[1];
+      const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+      await redisClient.setEx(`bl:${blToken}`, ttl, "invalid");
+
+      if (!decoded) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.log(error);
+    }
+  }
   async checkAuth(user) {
     try {
       const email = user.email;
